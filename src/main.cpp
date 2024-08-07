@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
+
 #include "stb_include.h"
+#include "color.h"
+// #include "vec3.h"
 
 int main( void )
 {
@@ -16,18 +19,11 @@ int main( void )
                   << ( image_height - i ) << ' ' << std::flush;
 
         for ( int j = 0; j < image_width; ++j ) {
-            auto r = double( i ) / ( image_width  - 1 );
-            auto g = double( j ) / ( image_height - 1 );
-            auto b = 0.0;
-
-            int ir = int( 255.999 * r );
-            int ig = int( 255.999 * g );
-            int ib = int( 255.999 * b );
-
             size_t pixel_index = ( i * image_width + j ) * 3;
-            pixels[pixel_index] = ir;
-            pixels[pixel_index + 1] = ig;
-            pixels[pixel_index + 2] = ib;
+            auto   pixel_color = color( double( j ) / ( image_width  - 1 ),
+                                        double( i ) / ( image_height - 1 ),
+                                        0.0 );
+            write_color( pixels, pixel_index, pixel_color );
         }
     }
 
