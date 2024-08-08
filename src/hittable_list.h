@@ -24,16 +24,14 @@ public:
         objects.push_back( object );
     }
 
-    bool hit( const ray& r,
-              double ray_tmin, double ray_tmax,
-              hit_record& rec ) const override
+    bool hit( const ray& r, interval ray_t, hit_record& rec ) const override
     {
         hit_record temp_rec;
         bool       hit_something = false;
-        auto       closest       = ray_tmax;
+        auto       closest       = ray_t.max;
 
         for ( const auto& object : objects ) {
-            if ( object->hit( r, ray_tmin, closest, temp_rec ) ) {
+            if ( object->hit( r, interval( ray_t.min, closest ), temp_rec ) ) {
                 hit_something = true;
                 closest = temp_rec.t;
                 rec = temp_rec;
