@@ -31,6 +31,7 @@ public:
 
         return *this;
     }
+
     vec3& operator *=( double t )
     {
         e[0] *= t;
@@ -39,6 +40,7 @@ public:
 
         return *this;
     }
+
     vec3& operator /=( double t )
     {
         return *this *= 1/t;
@@ -52,6 +54,15 @@ public:
     double length_squared() const
     {
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
+    }
+
+    bool near_zero() const
+    {
+        auto s = 1e-8;
+
+        return    ( std::fabs( e[0] ) < s )
+               && ( std::fabs( e[1] ) < s )
+               && ( std::fabs( e[2] ) < s );
     }
 
     static vec3 random( void )
@@ -144,6 +155,11 @@ inline vec3 random_on_hemisphere( const vec3& normal )
     vec3 on_unit_sphere = random_unit_vector();
 
     return dot( on_unit_sphere, normal ) > 0.0 ? on_unit_sphere : -on_unit_sphere;
+}
+
+inline vec3 reflect( const vec3& v, const vec3& n )
+{
+    return v - ( 2 * dot( v, n ) * n );
 }
 
 #endif

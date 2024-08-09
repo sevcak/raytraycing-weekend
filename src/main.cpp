@@ -1,11 +1,14 @@
 #include <cmath>
 
+#include "color.h"
 #include "rtweekend.h"
 
 #include "hittable.h"
 #include "hittable_list.h"
+#include "material.h"
 #include "sphere.h"
 #include "camera.h"
+#include "vec3.h"
 
 color ray_color( const ray& r, const hittable& world )
 {
@@ -22,8 +25,16 @@ color ray_color( const ray& r, const hittable& world )
 int main( void )
 {
     hittable_list world;
-    world.add( make_shared<sphere>( point3( 0,      0, -1 ), 0.5 ) );
-    world.add( make_shared<sphere>( point3( 0, -100.5, -1 ), 100 ) );
+
+    auto mat_ground = make_shared<lambertian>( color( 0.8, 0.8, 0.0 ) );
+    auto mat_center = make_shared<lambertian>( color( 0.1, 0.2, 0.5 ) );
+    auto mat_left   = make_shared<metal>(      color( 0.8, 0.8, 0.8 ) );
+    auto mat_right  = make_shared<metal>(      color( 0.8, 0.6, 0.2 ) );
+
+    world.add( make_shared<sphere>( point3(  0.0, -100.6, -1.0 ), 100.0, mat_ground ) );
+    world.add( make_shared<sphere>( point3(  0.0,    0.0, -1.2 ),   0.5, mat_center ) );
+    world.add( make_shared<sphere>( point3( -1.0,    0.0, -1.0 ),   0.5, mat_left ) );
+    world.add( make_shared<sphere>( point3(  1.0,    0.0, -1.0 ),   0.5, mat_right ) );
 
     camera cam;
     cam.aspect_ratio      = 16.0 / 9.0;
