@@ -12,11 +12,6 @@ using std::shared_ptr;
 /* Common headers */
 
 #include "constants.h"
-#include "vec3.h"
-#include "color.h"
-#include "ray.h"
-#include "interval.h"
-
 
 /* Utility functions */
 
