@@ -17,6 +17,11 @@ public:
     int    samples_per_pixel = 10;
     int    max_depth         = 10;
 
+    double v_fov     = 90;
+    point3 look_from = point3( 0, 0,  0 );
+    point3 look_at   = point3( 0, 0, -1 );
+    vec3   v_up        = vec3( 0, 1, 0 );
+
     int render( const hittable& world )
     {
         initialize();
@@ -59,8 +64,9 @@ private:
     double pixel_samples_scale;
     point3 center;
     point3 pixel_0_0_location;
-    vec3   pixel_delta_u;
-    vec3   pixel_delta_v;
+    vec3   pixel_delta_u;       /* Offset to pixel to the right */
+    vec3   pixel_delta_v;       /* Offset to pixel below */
+    vec3   u, v, w;             /* Camera frame basis vectors */
 
 
     void initialize( void )
@@ -70,20 +76,26 @@ private:
 
         pixel_samples_scale = 1.0 / samples_per_pixel;
 
-        center = point3( 0, 0, 0 );
+        center = look_from;
 
-        auto focal_length    = 1.0;
-        auto viewport_height = 2.0;
+        auto focal_length    = ( look_from - look_at ).length();
+        auto theta           = degrees_to_radians( v_fov );
+        auto h               = std::tan( theta/2 );
+        auto viewport_height = 2 * h * focal_length;
         auto viewport_width  = viewport_height * ( double( image_width ) / image_height );
 
-        auto viewport_u = vec3( viewport_width, 0, 0 );
-        auto viewport_v = vec3( 0, -viewport_height, 0 );
+        w = unit_vector( look_from - look_at );
+        u = unit_vector( cross( v_up, w ) );
+        v = cross( w, u );
+
+        auto viewport_u = viewport_width  *  u;
+        auto viewport_v = viewport_height * -v;
 
         pixel_delta_u = viewport_u / image_width;
         pixel_delta_v = viewport_v / image_height;
 
         auto viewport_upper_left = center
-                                   - vec3( 0, 0, focal_length )
+                                   - ( focal_length * w )
                                    - viewport_u/2
                                    - viewport_v/2;
         pixel_0_0_location = viewport_upper_left
