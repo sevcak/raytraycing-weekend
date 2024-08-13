@@ -84,9 +84,12 @@ public:
         double sin_theta = std::sqrt( 1.0 - cos_theta*cos_theta );
 
         bool cannot_refract = r_i * sin_theta  > 1.0;
-        vec3 direction = cannot_refract
-            ? reflect( unit_direction, rec.normal )
-            : refract( unit_direction, rec.normal, r_i );
+        vec3 direction;
+        if ( cannot_refract || reflectance( cos_theta, r_i ) > random_double() ) {
+            direction = reflect( unit_direction, rec.normal );
+        } else {
+            direction = refract( unit_direction, rec.normal, r_i );
+        }
 
         scattered = ray( rec.p, direction );
 
@@ -95,6 +98,14 @@ public:
 
 private:
     double refraction_index;
+
+    static double reflectance( double cosine, double refraction_index )
+    {
+        auto r_0 = ( 1 - refraction_index ) / ( 1 + refraction_index );
+        r_0 *= r_0;
+
+        return r_0 + ( ( 1 - r_0 ) * std::pow( ( 1 - cosine ), 5 ) );
+    }
 };
 
 #endif
